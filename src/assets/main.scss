@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap');
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  @apply font-medium;
+  font-family: 'Inter', sans-serif !important;
+}
+
+*:hover > .tooltip {
+  @apply block;
+}
+
+.tooltip {
+  @apply absolute text-sm bg-gray-50 rounded top-0 left-1/2 w-44 transform -translate-x-1/2 p-2 text-center shadow-sm border mb-10 border-gray-300 hidden;
+  --tw-translate-y: calc(-100% - 0.25rem);
+}
+
+.nav-link {
+  @apply flex flex-row mx-2 rounded-xl h-10 leading-10 px-3;
+
+  .icon {
+    @apply text-icon;
+  }
+  &.active {
+    @apply bg-bg1;
+
+    .icon {
+      @apply text-black;
+    }
+  }
+}
+
+.data-table {
+  @apply w-full;
+
+  td,
+  th {
+    @apply outline-none;
+
+    > div.cell {
+      @apply h-full w-full relative;
+
+      > div.cell-container {
+        @apply absolute border-2 border-transparent -left-0.5 -right-0.5 -top-0.5 -bottom-0.5;
+        border-radius: 0.375rem;
+      }
+    }
+
+    &:focus {
+      > div.label {
+        text-decoration: underline;
+      }
+
+      > div.cell > div.cell-container {
+        @apply border-primary-main;
+      }
+    }
+
+    &.editing {
+      > div.cell > div.cell-container {
+        @apply border-primary-darkest;
+      }
+    }
+  }
+
+  > thead {
+    > tr:first-child {
+      > th {
+        @apply font-medium text-xs text-label text-left align-top p-1 pb-0;
+
+        &.sortable {
+          @apply cursor-pointer;
+        }
+      }
+    }
+    > tr:last-child {
+      > th {
+        @apply font-medium;
+      }
+    }
+  }
+
+  > tbody {
+    > tr {
+      > td {
+        @apply text-sm border border-bg2 h-10 p-0;
+
+        &:first-child {
+          @apply border-l-0;
+        }
+
+        &:last-child {
+          @apply border-r-0;
+        }
+      }
+    }
+  }
+}
+
+.checkbox {
+  @apply block w-5 h-5 text-center border-2 rounded-lg text-white  outline-none;
+}
+
+.dropdown {
+  @apply w-full h-full relative outline-none;
+
+  > .options {
+    @apply absolute left-1/2 bg-white rounded-xl p-2 shadow-2xl border border-bg2 transform -translate-x-1/2 z-10 hidden;
+    top: calc(100% + 5px);
+    width: calc(100% + 4px);
+
+    > .option {
+      @apply rounded-lg text-sm cursor-pointer leading-6 px-2 py-1 flex flex-row justify-between;
+
+      &:hover,
+      &.active {
+        @apply bg-bg1;
+      }
+    }
+  }
+
+  &:focus {
+    > .options {
+      @apply block;
+    }
+  }
+}
+
+.text-input {
+  @apply h-full w-full border-0 outline-none px-2;
+
+  &:not(.plain) {
+    @apply bg-transparent;
+  }
+
+  &.plain {
+    @apply bg-bg1 rounded-lg;
+  }
+
+  &::placeholder {
+    @apply text-xs opacity-100 text-placeholder;
+  }
+}
