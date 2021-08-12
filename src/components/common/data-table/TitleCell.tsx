@@ -41,7 +41,7 @@ export const TitleCell = defineComponent({
         tabindex="0"
         class={{ sortable: props.column.sortable }}
         onFocus={props.onFocus}
-        onKeydown={prevent(stop(key(['Enter', ' '], props.onToggle)))}
+        onKeydown={key(['Enter', ' '], prevent(stop(props.onToggle)))}
       >
         <div class={{ label: true, sorting: props.sorting }} onClick={props.onToggle}>
           <div>{props.column.label}</div>
