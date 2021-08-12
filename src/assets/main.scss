@@ -40,7 +40,7 @@ body {
 
   td,
   th {
-    @apply outline-none;
+    @apply outline-none select-none;
 
     > div.cell {
       @apply h-full w-full relative;
@@ -53,7 +53,23 @@ body {
 
     &:focus {
       > div.label {
-        text-decoration: underline;
+        @apply underline flex flex-row justify-between;
+
+        > .icon {
+          @apply transform transition-transform;
+
+          &.asc {
+            @apply -rotate-90;
+          }
+
+          &.desc {
+            @apply rotate-90;
+          }
+        }
+
+        &.sorting {
+          @apply text-black;
+        }
       }
 
       > div.cell > div.cell-container {

@@ -1,5 +1,7 @@
 import { typedProp } from '@/types/props'
+import { key, prevent, stop } from '@/utils/events'
 import { defineComponent, onMounted, ref, watch } from 'vue'
+import { Icon } from '../Icon'
 import { TableColumn } from './Table'
 
 export const TitleCell = defineComponent({
@@ -13,7 +15,13 @@ export const TitleCell = defineComponent({
       type: Boolean,
       default: false,
     },
+    sorting: {
+      type: String,
+    },
     onFocus: {
+      type: typedProp<() => void>(Function),
+    },
+    onToggle: {
       type: typedProp<() => void>(Function),
     },
   },
@@ -28,8 +36,17 @@ export const TitleCell = defineComponent({
     onMounted(() => props.focused && th.value?.focus())
 
     return () => (
-      <th ref={th} tabindex="0" class={{ sortable: props.column.sortable }} onFocus={props.onFocus}>
-        <div class="label">{props.column.label}</div>
+      <th
+        ref={th}
+        tabindex="0"
+        class={{ sortable: props.column.sortable }}
+        onFocus={props.onFocus}
+        onKeydown={prevent(stop(key(['Enter', ' '], props.onToggle)))}
+      >
+        <div class={{ label: true, sorting: props.sorting }} onClick={props.onToggle}>
+          <div>{props.column.label}</div>
+          {props.sorting && <Icon class={props.sorting} name="mdiArrowRight" size="12" />}
+        </div>
       </th>
     )
   },

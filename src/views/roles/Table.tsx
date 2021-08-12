@@ -96,6 +96,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: DefaultFilter,
         filter: (row, filter) =>
           (filter as string[]).length === 0 || (filter as string[]).includes(String(Boolean(row.roleDefault))),
+        sortable: true,
+        comparator: (a, b) => (a.roleDefault ? -1 : b.roleDefault ? 1 : 0),
       },
       {
         key: 'roleLabel',
@@ -108,6 +110,8 @@ export const RoleTableView = defineComponent({
         filter: (row, filter) => {
           return row.roleLabel.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase())
         },
+        sortable: true,
+        comparator: (a, b) => a.roleLabel.localeCompare(b.roleLabel),
       },
       {
         key: 'readLoads',
@@ -119,6 +123,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.readLoads),
+        sortable: true,
+        comparator: (a, b) => a.readLoads.localeCompare(b.readLoads),
       },
       {
         key: 'manageLoads',
@@ -130,6 +136,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.manageLoads),
+        sortable: true,
+        comparator: (a, b) => a.manageLoads.localeCompare(b.manageLoads),
       },
       {
         key: 'readDrivers',
@@ -141,6 +149,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.readDrivers),
+        sortable: true,
+        comparator: (a, b) => a.readDrivers.localeCompare(b.readDrivers),
       },
       {
         key: 'manageDrivers',
@@ -152,6 +162,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.manageDrivers),
+        sortable: true,
+        comparator: (a, b) => a.manageDrivers.localeCompare(b.manageDrivers),
       },
       {
         key: 'readUsers',
@@ -163,6 +175,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.readUsers),
+        sortable: true,
+        comparator: (a, b) => a.readUsers.localeCompare(b.readUsers),
       },
       {
         key: 'manageUsers',
@@ -174,6 +188,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.manageUsers),
+        sortable: true,
+        comparator: (a, b) => a.manageUsers.localeCompare(b.manageUsers),
       },
       {
         key: 'readRoles',
@@ -185,6 +201,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.readRoles),
+        sortable: true,
+        comparator: (a, b) => a.readRoles.localeCompare(b.readRoles),
       },
       {
         key: 'manageRoles',
@@ -196,6 +214,8 @@ export const RoleTableView = defineComponent({
         filterRenderer: PermissionsFilter,
         filter: (row, filter) =>
           (filter as PermissionValue[]).length === 0 || (filter as PermissionValue[]).includes(row.manageRoles),
+        sortable: true,
+        comparator: (a, b) => a.manageRoles.localeCompare(b.manageRoles),
       },
     ])
 

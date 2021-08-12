@@ -32,7 +32,7 @@ export type TableColumn<T = any> = {
         }
       | {
           sortable: true
-          comparator: (val1: T[K], val2: T[K]) => -1 | 0 | 1
+          comparator: (val1: T, val2: T) => number
         }
     ) &
     (
@@ -65,8 +65,8 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
     setup(props) {
       const focusedCell = ref<[number, number]>([0, 0])
       const editing = ref(false)
-
       const filters = reactive<Record<number, unknown>>({})
+      const sorting = ref<null | [number, 'asc' | 'desc']>(null)
 
       const moveLeft = stop(
         prevent(() => {
@@ -97,12 +97,29 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
 
       const edit = stop(prevent(() => (editing.value = true)))
 
+      const toggleSort = (index: number) =>
+        props.columns[index].sortable &&
+        (sorting.value =
+          sorting.value == null || sorting.value[0] !== index
+            ? [index, 'asc']
+            : sorting.value[1] === 'asc'
+            ? [index, 'desc']
+            : null)
+
       const filteredRows = computed(() =>
         props.rows.filter(row =>
           props.columns
             .map((column, index) => filters[index] == null || column.filter?.(row, filters[index]))
             .every(el => el),
         ),
+      )
+
+      const sortedRows = computed(() =>
+        sorting.value == null
+          ? filteredRows.value
+          : [...filteredRows.value].sort(
+              (a, b) => props.columns[sorting.value![0]].comparator!(a, b) * (sorting.value![1] === 'asc' ? 1 : -1),
+            ),
       )
 
       return () => (
@@ -122,10 +139,12 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
                 <TitleCell
                   column={column as TableColumn}
                   focused={focusedCell.value[0] === -2 && focusedCell.value[1] === index}
+                  sorting={sorting.value?.[0] === index ? sorting.value?.[1] : ''}
                   onFocus={() => {
                     focusedCell.value = [-2, index]
                     editing.value = false
                   }}
+                  onToggle={() => toggleSort(index)}
                 />
               ))}
             </tr>
@@ -155,7 +174,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
             </tr>
           </thead>
           <tbody>
-            {filteredRows.value.map((row, rIndex) => (
+            {sortedRows.value.map((row, rIndex) => (
               <tr>
                 {props.columns.map((column, cIndex) => (
                   <EditableCell
