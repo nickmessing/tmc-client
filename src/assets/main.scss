@@ -75,25 +75,28 @@ body {
       }
     }
 
+    > div.label {
+      @apply flex flex-row justify-between;
+
+      &.sorting {
+        @apply text-black;
+      }
+      > .icon {
+        @apply transform transition-transform;
+
+        &.asc {
+          @apply -rotate-90;
+        }
+
+        &.desc {
+          @apply rotate-90;
+        }
+      }
+    }
+
     &:focus {
       > div.label {
-        @apply underline flex flex-row justify-between;
-
-        > .icon {
-          @apply transform transition-transform;
-
-          &.asc {
-            @apply -rotate-90;
-          }
-
-          &.desc {
-            @apply rotate-90;
-          }
-        }
-
-        &.sorting {
-          @apply text-black;
-        }
+        @apply underline;
       }
 
       > div.cell > div.cell-container {
