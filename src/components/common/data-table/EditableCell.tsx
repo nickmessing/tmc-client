@@ -1,5 +1,14 @@
 import { typedProp } from '@/types/props'
+import { onClickOutside } from '@/utils/clickOutside'
+import { prevent, stop } from '@/utils/events'
 import { defineComponent, ref, watch, onMounted } from 'vue'
+import { Icon } from '../Icon'
+
+export type ContextMenu = {
+  label: string
+  red?: boolean
+  action: () => void
+}[]
 
 export const EditableCell = defineComponent({
   name: 'EditableCell',
@@ -25,6 +34,9 @@ export const EditableCell = defineComponent({
     editor: {
       type: typedProp<any>(Object),
     },
+    contextMenu: {
+      type: typedProp<ContextMenu>(Array),
+    },
     onUpdate: {
       type: typedProp<(val: unknown) => Promise<unknown>>(Function),
     },
@@ -39,7 +51,11 @@ export const EditableCell = defineComponent({
     },
   },
   setup(props) {
+    const td = ref<HTMLTableDataCellElement | null>(null)
+    const div = ref<HTMLDivElement | null>(null)
+
     const saving = ref(false)
+    const contextMenuVisible = ref(false)
 
     const edit = () => props.editable && props.onEdit?.()
 
@@ -54,14 +70,16 @@ export const EditableCell = defineComponent({
       props.focused && td.value?.focus()
     }
 
-    const td = ref<HTMLTableDataCellElement | null>(null)
-
     watch(
       () => props.focused,
       focused => focused && td.value?.focus(),
     )
 
     onMounted(() => props.focused && td.value?.focus())
+
+    onClickOutside(div, () => {
+      contextMenuVisible.value = false
+    })
 
     return () => {
       const Editor = props.editor as any
@@ -70,6 +88,33 @@ export const EditableCell = defineComponent({
       return (
         <td ref={td} tabindex="0" class={{ editing: props.editing }} onFocus={props.onFocus} onDblclick={edit}>
           <div class={{ cell: true, 'opacity-20': saving.value }}>
+            {props.contextMenu && (
+              <div
+                class="context-button"
+                onClick={prevent(stop(() => (contextMenuVisible.value = !contextMenuVisible.value)))}
+                onDblclick={prevent(stop())}
+              >
+                <Icon size="16" name="mdiDotsVertical" />
+              </div>
+            )}
+            {props.contextMenu && (
+              <div
+                ref={div}
+                class={{ 'context-menu': true, block: contextMenuVisible.value, hidden: !contextMenuVisible.value }}
+              >
+                {props.contextMenu.map(entry => (
+                  <button
+                    class={{ red: entry.red }}
+                    onClick={() => {
+                      contextMenuVisible.value = false
+                      entry.action()
+                    }}
+                  >
+                    {entry.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <div class="cell-container">
               {props.editing ? (
                 <Editor initialValue={props.value} onUpdate={update} onCancel={cancel} focused />

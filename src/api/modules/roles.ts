@@ -20,10 +20,14 @@ const rolesModule = {
         loading[key.value] = true
         try {
           const result = await findAll()
-          responseCache[key.value] = result.map(role => {
-            cachedById[role.id] = fixDates(role)
-            return role.id
-          })
+          responseCache[key.value] = result
+            .map(role => {
+              const fixed = fixDates(role)
+              cachedById[role.id] = fixed
+              return fixed
+            })
+            .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis())
+            .map(role => role.id)
         } catch (e) {
           console.error(e)
         }

@@ -86,6 +86,7 @@ export const RoleTableView = defineComponent({
         key: 'roleDefault',
         label: 'Default',
         editable: true,
+        width: 4,
         renderer: CheckboxRenderer,
         editorRenderer: CheckboxEditor,
         async save(row, val) {
@@ -103,6 +104,7 @@ export const RoleTableView = defineComponent({
         key: 'roleLabel',
         label: 'Name',
         editable: true,
+        width: 35,
         async save(row, val) {
           await roles.update(row.id, { label: val })
         },
@@ -219,9 +221,50 @@ export const RoleTableView = defineComponent({
       },
     ])
 
+    const duplicate = (roleId: string) => async () => {
+      const permissionsToCopy = allPermissions.data.value.filter(permission => permission.roleId === roleId)
+      const role = all.data.value.find(role => role.id === roleId)!
+
+      let label = `Copy of ${role.label}`
+      if (label.startsWith('Copy of Copy of')) {
+        label = label.substring(8)
+        const matcher = label.match(/\s\((\d{1,})\)$/)
+        if (matcher) {
+          const counter = Number(matcher[1])
+          label = label.replace(/\s\((\d{1,})\)$/, ` (${counter + 1})`)
+        } else {
+          label = `${label} (1)`
+        }
+      }
+
+      const createdRole = await roles.create({
+        label,
+      })
+      await permissions.create({
+        roleId: createdRole.id,
+        permissions: permissionsToCopy.map(({ action, model, value }) => ({ action, model, value })),
+      })
+    }
+
+    const removeRole = (roleId: string) => async () => {
+      await Promise.all(
+        allPermissions.data.value
+          .filter(permission => permission.roleId === roleId)
+          .map(permission => permissions.remove(permission.id)),
+      )
+      await roles.remove(roleId)
+    }
+
     return () => (
       <div class="relative w-full h-full">
-        <Table rows={rows.value} columns={columns.value} />
+        <Table
+          rows={rows.value}
+          columns={columns.value}
+          contextMenu={row => [
+            { label: 'Duplicate', action: duplicate(row.id) },
+            { label: 'Delete', red: true, action: removeRole(row.id) },
+          ]}
+        />
       </div>
     )
   },

@@ -15,6 +15,10 @@ export const TitleCell = defineComponent({
       type: Boolean,
       default: false,
     },
+    defaultWidth: {
+      type: Number,
+      required: true,
+    },
     sorting: {
       type: String,
     },
@@ -40,6 +44,7 @@ export const TitleCell = defineComponent({
         ref={th}
         tabindex="0"
         class={{ sortable: props.column.sortable }}
+        style={`width: ${props.column.width ?? props.defaultWidth}%`}
         onFocus={props.onFocus}
         onKeydown={key(['Enter', ' '], prevent(stop(props.onToggle)))}
       >

@@ -2,7 +2,7 @@ import { typedProp } from '@/types/props'
 import { group, key, prevent, stop } from '@/utils/events'
 import { DateTime } from 'luxon'
 import { computed, defineComponent, reactive, ref } from 'vue'
-import { EditableCell } from './EditableCell'
+import { ContextMenu, EditableCell } from './EditableCell'
 import { TextEditor } from './editors/TextEditor'
 import { FilterCell } from './FilterCell'
 import { TextRenderer } from './renderers/TextRenderer'
@@ -12,6 +12,7 @@ export type TableColumn<T = any> = {
   [K in keyof T]: {
     key: K
     label: string
+    width?: number
     renderer?: ReturnType<typeof defineComponent>
   } & (
     | {
@@ -61,12 +62,22 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
         type: typedProp<T[]>(Array),
         required: true,
       },
+      contextMenu: {
+        type: typedProp<(row: T) => ContextMenu>(Function),
+      },
     },
     setup(props) {
       const focusedCell = ref<[number, number]>([0, 0])
       const editing = ref(false)
       const filters = reactive<Record<number, unknown>>({})
       const sorting = ref<null | [number, 'asc' | 'desc']>(null)
+
+      const columnsWithWidth = computed(() => props.columns.filter(column => column.width != null))
+      const defaultWidth = computed(
+        () =>
+          (100 - columnsWithWidth.value.map(column => column.width!).reduce<number>((sum, width) => sum + width, 0)) /
+          (props.columns.length - columnsWithWidth.value.length),
+      )
 
       const moveLeft = stop(
         prevent(() => {
@@ -138,6 +149,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
               {props.columns.map((column, index) => (
                 <TitleCell
                   column={column as TableColumn}
+                  defaultWidth={defaultWidth.value}
                   focused={focusedCell.value[0] === -2 && focusedCell.value[1] === index}
                   sorting={sorting.value?.[0] === index ? sorting.value?.[1] : ''}
                   onFocus={() => {
@@ -175,7 +187,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
           </thead>
           <tbody>
             {sortedRows.value.map((row, rIndex) => (
-              <tr>
+              <tr key={row.id}>
                 {props.columns.map((column, cIndex) => (
                   <EditableCell
                     value={row[column.key]}
@@ -184,6 +196,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
                     editable={Boolean(column.editable)}
                     editing={focusedCell.value[0] === rIndex && focusedCell.value[1] === cIndex && editing.value}
                     focused={focusedCell.value[0] === rIndex && focusedCell.value[1] === cIndex}
+                    contextMenu={cIndex === 0 ? props.contextMenu?.(row) : undefined}
                     onUpdate={async val => {
                       editing.value = false
                       return column.save?.(row, val as T[keyof T])

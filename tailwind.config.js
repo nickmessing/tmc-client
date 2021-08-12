@@ -16,6 +16,7 @@ module.exports = {
         placeholder: '#bfbfbf',
         bg2: '#e5e5e5',
         bg1: '#f5f5f5',
+        danger: '#f02038',
       },
       lineHeight: {
         20: '5rem',
