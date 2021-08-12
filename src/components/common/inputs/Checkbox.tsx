@@ -30,7 +30,7 @@ export const Checkbox = defineComponent({
     return () => (
       <div
         ref={div}
-        tabindex="0"
+        tabindex={props.disabled ? undefined : '0'}
         class={{
           checkbox: true,
           'border-icon': !props.value,
@@ -39,6 +39,9 @@ export const Checkbox = defineComponent({
           'cursor-pointer': !props.disabled,
         }}
         onClick={() => {
+          if (props.disabled) {
+            return
+          }
           div.value?.focus()
           const newVal = !props.value
           props.onInput?.(newVal)
