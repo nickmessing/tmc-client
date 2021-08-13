@@ -93,10 +93,6 @@ export interface components {
       token: string
       data: components['schemas']['AuthenticationResult']
     }
-    PaginatedUser: {
-      data: components['schemas']['User'][]
-      total: number
-    }
     UpdateUserDto: {
       roleId: string
     }
@@ -152,15 +148,11 @@ export interface operations {
     }
   }
   UsersController_find: {
-    parameters: {
-      query: {
-        page: string
-      }
-    }
+    parameters: {}
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['PaginatedUser']
+          'application/json': components['schemas']['User'][]
         }
       }
     }

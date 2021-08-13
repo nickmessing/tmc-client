@@ -109,9 +109,7 @@ export const RoleTableView = defineComponent({
           await roles.update(row.id, { label: val })
         },
         filterable: true,
-        filter: (row, filter) => {
-          return row.roleLabel.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase())
-        },
+        filter: (row, filter) => row.roleLabel.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()),
         sortable: true,
         comparator: (a, b) => a.roleLabel.localeCompare(b.roleLabel),
       },

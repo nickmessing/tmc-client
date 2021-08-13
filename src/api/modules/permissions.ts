@@ -6,7 +6,7 @@ import { fixDates, FixedDates } from '@/utils/dates'
 
 export type Permission = FixedDates<components['schemas']['Permission']>
 
-const cachedById: Record<string, Permission> = reactive({})
+const cachedById: Record<string, Permission | null> = reactive({})
 const responseCache: Record<string, string[]> = reactive({})
 const loading: Record<string, boolean> = reactive({})
 
@@ -58,7 +58,7 @@ const permissionsModule = {
   },
   async remove(id: string) {
     const permission = await remove({ path: { id } })
-    delete cachedById[permission.id]
+    cachedById[id] = null
     return permission
   },
 }

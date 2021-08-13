@@ -106,7 +106,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
         }),
       )
 
-      const edit = stop(prevent(() => (editing.value = true)))
+      const edit = stop(prevent(() => props.columns[focusedCell.value[1]].editable && (editing.value = true)))
 
       const toggleSort = (index: number) =>
         props.columns[index].sortable &&
