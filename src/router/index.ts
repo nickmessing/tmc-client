@@ -1,6 +1,7 @@
 import { Index } from '@/views/Index'
 import { RoleIndexView } from '@/views/roles/Index'
 import { RoleTableView } from '@/views/roles/Table'
+import { UsersIndexView } from '@/views/users/Index'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
@@ -20,6 +21,12 @@ const routes: Array<RouteRecordRaw> = [
         component: RoleTableView,
       },
     ],
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: UsersIndexView,
+    children: [],
   },
 ]
 
