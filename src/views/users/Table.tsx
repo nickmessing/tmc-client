@@ -2,7 +2,7 @@ import { computed, defineComponent } from 'vue'
 import { createTable, TableColumn } from '@/components/common/data-table/Table'
 import { DateTime } from 'luxon'
 import { useUsers } from '@/api/modules/users'
-import { useRoles } from '@/api/modules/roles'
+import { Role, useRoles } from '@/api/modules/roles'
 import { RoleRenderer } from '@/components/common/data-table/renderers/RoleRenderer'
 
 export interface TableRow {
@@ -12,7 +12,7 @@ export interface TableRow {
   name: string
   email: string
   roleId: string
-  roleName: string
+  role: Role | null
 }
 
 const Table = createTable<TableRow>()
@@ -33,7 +33,7 @@ export const UsersTableView = defineComponent({
         name: user.name,
         email: user.email,
         roleId: user.roleId,
-        roleName: allRoles.data.value.find(role => role.id === user.roleId)?.label ?? '',
+        role: allRoles.data.value.find(role => role.id === user.roleId) ?? null,
       })),
     )
 
@@ -43,19 +43,26 @@ export const UsersTableView = defineComponent({
         label: 'Full Name',
         filterable: true,
         filter: (row, filter) => row.name.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()),
+        sortable: true,
+        comparator: (a, b) => a.name.localeCompare(b.name),
       },
       {
         key: 'email',
         label: 'Email',
         filterable: true,
         filter: (row, filter) => row.email.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()),
+        sortable: true,
+        comparator: (a, b) => a.email.localeCompare(b.email),
       },
       {
-        key: 'roleId',
+        key: 'role',
         label: 'Role',
         renderer: RoleRenderer,
         filterable: true,
-        filter: (row, filter) => row.roleName.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()),
+        filter: (row, filter) =>
+          row.role?.label.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()) ?? true,
+        sortable: true,
+        comparator: (a, b) => (a.role?.label ?? '').localeCompare(b.role?.label ?? ''),
       },
     ])
 
