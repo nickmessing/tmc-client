@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        name: 'RolesList',
+        name: 'UsersList',
         component: UsersTableView,
       },
     ],
