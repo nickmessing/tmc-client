@@ -1,6 +1,6 @@
 import { typedProp } from '@/types/props'
 import { group, key, prevent, stop } from '@/utils/events'
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
 import { Icon } from '../Icon'
 
 export const Dropdown = defineComponent({
@@ -26,6 +26,10 @@ export const Dropdown = defineComponent({
       type: Boolean,
       default: false,
     },
+    searchable: {
+      type: Boolean,
+      default: false,
+    },
     onInput: {
       type: typedProp<(val: string | string[]) => void>(Function),
     },
@@ -38,25 +42,38 @@ export const Dropdown = defineComponent({
   },
   setup(props) {
     const div = ref<HTMLDivElement | null>(null)
+    const inputEl = ref<HTMLInputElement | null>(null)
 
     const activeSelect = ref(-1)
     const mouseOver = ref(false)
+    const searching = ref(false)
+    const searchString = ref('')
 
     const isSelected = (value: string) =>
       props.multiple ? (props.value as string[]).includes(value) : value === props.value
 
-    onMounted(() => {
+    onMounted(async () => {
       if (props.focused) {
-        div.value?.focus()
+        await nextTick()
+        if (props.searchable) {
+          inputEl.value?.focus()
+        } else {
+          div.value?.focus()
+        }
       }
       activeSelect.value = props.options.findIndex(option => isSelected(option.value))
     })
 
     watch(
       () => props.focused,
-      focused => {
+      async focused => {
+        await nextTick()
         if (focused) {
-          div.value?.focus()
+          if (props.searchable) {
+            inputEl.value?.focus()
+          } else {
+            div.value?.focus()
+          }
         }
       },
     )
@@ -98,22 +115,23 @@ export const Dropdown = defineComponent({
         : props.options.find(opt => opt.value === (props.value as string))?.label ?? '',
     )
 
+    const filteredOptions = computed(() =>
+      searchString.value
+        ? props.options.filter(option => option.label.toLocaleLowerCase().includes(searchString.value))
+        : props.options,
+    )
+
     return () => (
       <div
         class="dropdown p-1"
         tabindex="0"
         ref={div}
-        onClick={() => div.value?.focus()}
-        onKeydown={stop(
-          prevent(
-            group(
-              key('ArrowDown', moveDown),
-              key('ArrowUp', moveUp),
-              key('Enter', () => submit(props.options[activeSelect.value]?.value)),
-              key(' ', () => input(props.options[activeSelect.value]?.value)),
-              key('Escape', props.onCancel),
-            ),
-          ),
+        onKeydown={group(
+          key('ArrowDown', stop(prevent(moveDown))),
+          key('ArrowUp', stop(prevent(moveUp))),
+          key('Enter', stop(prevent(() => submit(props.options[activeSelect.value]?.value)))),
+          key(' ', stop(prevent(() => input(props.options[activeSelect.value]?.value)))),
+          key('Escape', stop(prevent(props.onCancel))),
         )}
       >
         <div
@@ -126,11 +144,23 @@ export const Dropdown = defineComponent({
           {displayText.value || 'Select'}
         </div>
         <div
-          class="options"
+          class={{ options: true, visible: searching.value || props.focused }}
           onMouseenter={() => (mouseOver.value = true)}
           onMouseleave={() => (mouseOver.value = false)}
         >
-          {props.options.map((option, index) => (
+          {props.searchable && (
+            <input
+              ref={inputEl}
+              value={searchString.value}
+              type="text"
+              placeholder="Search"
+              class="rounded-lg bg-bg1 w-full h-10 mb-2 px-2 outline-none"
+              onInput={event => (searchString.value = (event.target as HTMLInputElement).value)}
+              onFocus={() => (searching.value = true)}
+              onBlur={() => (searching.value = false)}
+            />
+          )}
+          {filteredOptions.value.map((option, index) => (
             <div
               class={{
                 option: true,

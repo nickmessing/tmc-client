@@ -153,9 +153,17 @@ body {
   @apply w-full h-full relative outline-none;
 
   > .options {
-    @apply absolute left-1/2 bg-white rounded-xl p-2 shadow-2xl border border-bg2 transform -translate-x-1/2 z-10 hidden;
+    @apply absolute left-1/2 bg-white rounded-xl p-2 shadow-2xl border border-bg2 transform -translate-x-1/2 z-10;
     top: calc(100% + 5px);
     width: calc(100% + 4px);
+
+    &:not(.visible) {
+      @apply hidden;
+    }
+
+    &.visible {
+      @apply block;
+    }
 
     > .option {
       @apply rounded-lg text-sm cursor-pointer leading-6 px-2 py-1 flex flex-row justify-between;
@@ -164,12 +172,6 @@ body {
       &.active {
         @apply bg-bg1;
       }
-    }
-  }
-
-  &:focus {
-    > .options {
-      @apply block;
     }
   }
 }

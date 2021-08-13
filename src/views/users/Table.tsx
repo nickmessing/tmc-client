@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import { useUsers } from '@/api/modules/users'
 import { Role, useRoles } from '@/api/modules/roles'
 import { RoleRenderer } from '@/components/common/data-table/renderers/RoleRenderer'
+import { RoleEditor } from '@/components/common/data-table/editors/RoleEditor'
 
 export interface TableRow {
   id: string
@@ -55,7 +56,7 @@ export const UsersTableView = defineComponent({
         comparator: (a, b) => a.email.localeCompare(b.email),
       },
       {
-        key: 'role',
+        key: 'roleId',
         label: 'Role',
         renderer: RoleRenderer,
         filterable: true,
@@ -63,6 +64,11 @@ export const UsersTableView = defineComponent({
           row.role?.label.toLocaleLowerCase().includes((filter as string).toLocaleLowerCase()) ?? true,
         sortable: true,
         comparator: (a, b) => (a.role?.label ?? '').localeCompare(b.role?.label ?? ''),
+        editable: true,
+        editorRenderer: RoleEditor,
+        async save(row, roleId) {
+          return users.update(row.id, { roleId })
+        },
       },
     ])
 
