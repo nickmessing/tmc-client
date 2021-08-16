@@ -96,6 +96,7 @@ export const TextEditor = defineComponent({
                 'Enter',
                 prevent(() => props.onUpdate?.(value.value)),
               ),
+              key('Tab', () => props.onUpdate?.(value.value)),
               key(
                 'Escape',
                 prevent(() => props.onCancel?.()),
