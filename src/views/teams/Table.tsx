@@ -39,17 +39,18 @@ export const TeamsDriversTableView = defineComponent({
 
     const editField = (key: CommonKey) => async (row: TableRow, value: string) => {
       if (row.type === 'team') {
-        const team = allTeams.data.value.find(team => team.id === row.id)
-        if (team == null) {
-          return
-        }
+        const driversList = allDrivers.data.value.filter(driver => driver.teamId === row.id)
 
-        const driversList = allDrivers.data.value.filter(driver => driver.teamId === team.id)
+        await teams.update(row.id, { key, value })
 
-        await teams.update(team.id, { key, value })
-
-        if (driversList.length === 1 || key === CommonKey.Trailer || key === CommonKey.Trailer) {
+        if (driversList.length === 1 || key === CommonKey.Truck || key === CommonKey.Trailer) {
           await Promise.all(driversList.map(driver => drivers.update(driver.id, { key, value })))
+        }
+      } else {
+        await drivers.update(row.id, { key, value })
+
+        if (key === CommonKey.Truck || key === CommonKey.Trailer) {
+          await teams.update(row.teamId, { key, value })
         }
       }
     }
