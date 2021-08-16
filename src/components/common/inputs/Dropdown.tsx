@@ -121,6 +121,11 @@ export const Dropdown = defineComponent({
         : props.options,
     )
 
+    watch(
+      () => searchString.value,
+      () => (activeSelect.value = 0),
+    )
+
     return () => (
       <div
         class="dropdown p-1"
