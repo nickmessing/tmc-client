@@ -1,7 +1,7 @@
 import { typedProp } from '@/types/props'
 import { group, key, prevent, stop } from '@/utils/events'
 import { DateTime } from 'luxon'
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { computed, defineComponent, reactive, ref, Ref, watch } from 'vue'
 import { ContextMenu, EditableCell } from './EditableCell'
 import { TextEditor } from './editors/TextEditor'
 import { FilterCell } from './FilterCell'
@@ -12,6 +12,7 @@ export type TableColumn<T = any> = {
   [K in keyof T]: {
     key: K
     label: string
+    placeholder?: string
     width?: number
     renderer?: ReturnType<typeof defineComponent>
   } & (
@@ -62,8 +63,26 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
         type: typedProp<T[]>(Array),
         required: true,
       },
+      expandable: {
+        type: Boolean,
+        default: false,
+      },
+      expandableRows: {
+        type: typedProp<string[]>(Array),
+        default: () => [] as string[],
+      },
+      expandedRows: {
+        type: typedProp<string[]>(Array),
+        default: () => [] as string[],
+      },
+      focusRef: {
+        type: typedProp<Ref<T | null>>(Object),
+      },
       contextMenu: {
         type: typedProp<(row: T) => ContextMenu>(Function),
+      },
+      onToggleExpand: {
+        type: typedProp<(id: string) => void>(Function),
       },
     },
     setup(props) {
@@ -133,6 +152,11 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
             ),
       )
 
+      watch(
+        () => focusedCell.value,
+        cell => props.focusRef && (props.focusRef.value = sortedRows.value[cell[0]] ?? null),
+      )
+
       return () => (
         <table
           class="data-table"
@@ -197,6 +221,10 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
                     editing={focusedCell.value[0] === rIndex && focusedCell.value[1] === cIndex && editing.value}
                     focused={focusedCell.value[0] === rIndex && focusedCell.value[1] === cIndex}
                     contextMenu={cIndex === 0 ? props.contextMenu?.(row) : undefined}
+                    expandableSpace={cIndex === 0 && props.expandable}
+                    expandable={cIndex === 0 && props.expandableRows.includes(row.id)}
+                    expanded={cIndex === 0 && props.expandedRows.includes(row.id)}
+                    placeholder={column.placeholder}
                     onUpdate={async val => {
                       editing.value = false
                       return column.save?.(row, val as T[keyof T])
@@ -210,6 +238,7 @@ export const createTable = <T extends { id: string; createdAt: DateTime; updated
                       focusedCell.value = [rIndex, cIndex]
                       editing.value = true
                     }}
+                    onToggleExpand={() => props.onToggleExpand?.(row.id)}
                   />
                 ))}
               </tr>

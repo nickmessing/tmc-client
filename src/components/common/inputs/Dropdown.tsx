@@ -129,8 +129,8 @@ export const Dropdown = defineComponent({
         onKeydown={group(
           key('ArrowDown', stop(prevent(moveDown))),
           key('ArrowUp', stop(prevent(moveUp))),
-          key('Enter', stop(prevent(() => submit(props.options[activeSelect.value]?.value)))),
-          key(' ', stop(prevent(() => input(props.options[activeSelect.value]?.value)))),
+          key('Enter', stop(prevent(() => submit(filteredOptions.value[activeSelect.value]?.value)))),
+          key(' ', stop(prevent(() => input(filteredOptions.value[activeSelect.value]?.value)))),
           key('Escape', stop(prevent(props.onCancel))),
         )}
       >

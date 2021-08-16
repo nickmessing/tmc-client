@@ -54,7 +54,7 @@ body {
       }
 
       > div.context-menu {
-        @apply bg-white absolute shadow-2xl border border-bg2 rounded-xl p-2 z-10 w-32 -left-6 top-9;
+        @apply bg-white absolute shadow-2xl border border-bg2 rounded-xl p-2 z-10 -left-6 top-9;
 
         > button {
           @apply block h-8 px-2 py-1 text-sm w-full text-left rounded-lg;

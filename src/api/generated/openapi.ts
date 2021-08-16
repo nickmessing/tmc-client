@@ -49,9 +49,22 @@ export interface paths {
     post: operations['DriversController_create']
   }
   '/drivers/{id}': {
-    get: operations['DriversController_findOne']
     delete: operations['DriversController_remove']
     patch: operations['DriversController_update']
+  }
+  '/drivers/{id}/team/{teamId}': {
+    patch: operations['DriversController_updateTeam']
+  }
+  '/teams': {
+    get: operations['TeamsController_findAll']
+    post: operations['TeamsController_create']
+  }
+  '/teams/{id}': {
+    delete: operations['TeamsController_remove']
+    patch: operations['TeamsController_update']
+  }
+  '/teams/{id}/dispatcher/{dispatcherId}': {
+    patch: operations['TeamsController_updateDispatcher']
   }
 }
 
@@ -120,8 +133,33 @@ export interface components {
     }
     CreateLoadDto: { [key: string]: unknown }
     UpdateLoadDto: { [key: string]: unknown }
-    CreateDriverDto: { [key: string]: unknown }
-    UpdateDriverDto: { [key: string]: unknown }
+    Driver: {
+      id: string
+      createdAt: string
+      updatedAt: string
+      name: string
+      phone: string
+      email: string
+      truck: string
+      trailer: string
+      teamId: string | null
+    }
+    CommonKey: 'Name' | 'Phone' | 'Email' | 'Truck' | 'Trailer'
+    UpdateCommonDto: {
+      key: components['schemas']['CommonKey']
+      value: string
+    }
+    Team: {
+      id: string
+      createdAt: string
+      updatedAt: string
+      name: string
+      phone: string
+      email: string
+      truck: string
+      trailer: string
+      dispatcherId: string | null
+    }
   }
 }
 
@@ -389,28 +427,21 @@ export interface operations {
   DriversController_findAll: {
     parameters: {}
     responses: {
-      200: unknown
+      200: {
+        content: {
+          'application/json': components['schemas']['Driver'][]
+        }
+      }
     }
   }
   DriversController_create: {
     parameters: {}
     responses: {
-      201: unknown
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateDriverDto']
+      201: {
+        content: {
+          'application/json': components['schemas']['Driver']
+        }
       }
-    }
-  }
-  DriversController_findOne: {
-    parameters: {
-      path: {
-        id: string
-      }
-    }
-    responses: {
-      200: unknown
     }
   }
   DriversController_remove: {
@@ -420,7 +451,11 @@ export interface operations {
       }
     }
     responses: {
-      200: unknown
+      200: {
+        content: {
+          'application/json': components['schemas']['Driver']
+        }
+      }
     }
   }
   DriversController_update: {
@@ -430,11 +465,98 @@ export interface operations {
       }
     }
     responses: {
-      200: unknown
+      200: {
+        content: {
+          'application/json': components['schemas']['Driver']
+        }
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateDriverDto']
+        'application/json': components['schemas']['UpdateCommonDto']
+      }
+    }
+  }
+  DriversController_updateTeam: {
+    parameters: {
+      path: {
+        id: string
+        teamId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Driver']
+        }
+      }
+    }
+  }
+  TeamsController_findAll: {
+    parameters: {}
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Team'][]
+        }
+      }
+    }
+  }
+  TeamsController_create: {
+    parameters: {}
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['Team']
+        }
+      }
+    }
+  }
+  TeamsController_remove: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Team']
+        }
+      }
+    }
+  }
+  TeamsController_update: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Team']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateCommonDto']
+      }
+    }
+  }
+  TeamsController_updateDispatcher: {
+    parameters: {
+      path: {
+        id: string
+        dispatcherId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Team']
+        }
       }
     }
   }

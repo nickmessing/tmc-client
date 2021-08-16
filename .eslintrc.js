@@ -21,6 +21,7 @@ module.exports = {
     'vue/require-prop-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
+    'vue/no-mutating-props': 'off',
   },
   ignorePatterns: ['src/api/generated/*.ts'],
   overrides: [

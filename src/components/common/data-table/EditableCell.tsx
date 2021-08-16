@@ -16,6 +16,9 @@ export const EditableCell = defineComponent({
     value: {
       required: true,
     },
+    placeholder: {
+      type: String,
+    },
     editable: {
       type: Boolean,
       required: true,
@@ -34,6 +37,18 @@ export const EditableCell = defineComponent({
     editor: {
       type: typedProp<any>(Object),
     },
+    expandable: {
+      type: Boolean,
+      default: false,
+    },
+    expanded: {
+      type: Boolean,
+      default: false,
+    },
+    expandableSpace: {
+      type: Boolean,
+      default: false,
+    },
     contextMenu: {
       type: typedProp<ContextMenu>(Array),
     },
@@ -47,6 +62,9 @@ export const EditableCell = defineComponent({
       type: typedProp<() => void>(Function),
     },
     onCancel: {
+      type: typedProp<() => void>(Function),
+    },
+    onToggleExpand: {
       type: typedProp<() => void>(Function),
     },
   },
@@ -93,6 +111,7 @@ export const EditableCell = defineComponent({
                 class="context-button"
                 onClick={prevent(stop(() => (contextMenuVisible.value = !contextMenuVisible.value)))}
                 onDblclick={prevent(stop())}
+                onMousedown={prevent(stop())}
               >
                 <Icon size="16" name="mdiDotsVertical" />
               </div>
@@ -119,8 +138,25 @@ export const EditableCell = defineComponent({
               {props.editing ? (
                 <Editor initialValue={props.value} onUpdate={update} onCancel={cancel} focused />
               ) : (
-                <div class="h-full w-full whitespace-nowrap overflow-hidden">
-                  <Renderer value={props.value} />
+                <div class="h-full w-full flex flex-row">
+                  <div class="flex-shrink">
+                    {props.expandableSpace && (
+                      <div
+                        class={{
+                          'mx-3 rounded-lg w-6 h-6 my-2 flex justify-center': true,
+                          'bg-bg1 cursor-pointer': props.expandable,
+                        }}
+                        onClick={() => props.expandable && props.onToggleExpand?.()}
+                      >
+                        {props.expandable && (
+                          <Icon name={props.expanded ? 'mdiChevronUp' : 'mdiChevronDown'} size="16" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div class="flex-grow whitespace-nowrap overflow-hidden">
+                    <Renderer value={props.value} placeholder={props.placeholder} />
+                  </div>
                 </div>
               )}
             </div>
